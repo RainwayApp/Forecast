@@ -40,25 +40,25 @@ namespace Forecast.Models
                 var term = "";
                 var value = "";
                 var open = false;
-                var skipnext = false;
                 var ignore = false;
-                var first = false;
                 for (int i = 0; i < input.Length; ++i)
                 {
                     var ch = input[i];
-                    first = false;
                     if (open)
                     {
-                        if (!skipnext && ch == '\\')
+                        if (ch == '\\')
                         {
-                            skipnext = true;
-                            first = true;
+                            i += 1;
+                            if (input.Length < i)
+                            {
+                                value += input[i];
+                            }
                         }
-                        else if (!skipnext && ch == '"')
+                        else if (ch == '"')
                         {
                             ignore = !ignore;
                         }
-                        else if (!skipnext && !ignore && ch == ',')
+                        else if (!ignore && ch == ',')
                         {
                             open = false;
                             i += 1;
@@ -69,15 +69,9 @@ namespace Forecast.Models
                         {
                             value += ch;
                         }
-                        
-                        if (skipnext && !first)
-                        {
-                            skipnext = false;
-                        }
                     }
                     else
                     {
-                        skipnext = false;
                         if (ch == '=')
                         {
                             open = true;
