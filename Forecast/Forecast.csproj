@@ -4,6 +4,13 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.0</TargetFramework>
     <RuntimeIdentifiers>win10-x64;ubuntu.16.10-x64;osx-x64</RuntimeIdentifiers>
+    <Authors>Rainway, Inc.</Authors>
+    <Company>Rainway, Inc.</Company>
+    <PackageProjectUrl>https://rainway.io</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/RainwayApp/Forecast/blob/master/LICENSE</PackageLicenseUrl>
+    <RepositoryUrl>https://github.com/RainwayApp/Forecast</RepositoryUrl>
+    <RepositoryType></RepositoryType>
+    <Description>A cross-platform utility for testing HTTP and WebSocket server connectivity.</Description>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
