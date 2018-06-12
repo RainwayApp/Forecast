@@ -42,14 +42,17 @@ namespace Forecast.Models
                 var open = false;
                 var skipnext = false;
                 var ignore = false;
+                var first = false;
                 for (int i = 0; i < input.Length; ++i)
                 {
                     var ch = input[i];
+                    first = false;
                     if (open)
                     {
                         if (!skipnext && ch == '\\')
                         {
                             skipnext = true;
+                            first = true;
                         }
                         else if (!skipnext && ch == '"')
                         {
@@ -66,9 +69,15 @@ namespace Forecast.Models
                         {
                             value += ch;
                         }
+                        
+                        if (skipnext && !first)
+                        {
+                            skipnext = false;
+                        }
                     }
                     else
                     {
+                        skipnext = false;
                         if (ch == '=')
                         {
                             open = true;
