@@ -8,6 +8,9 @@ Forecast is small and simple cross-platform utility for testing HTTP and WebSock
 - Validate the existence of A and AAAA records
 - Human readable outputs
 
+# Downloads
+
+Click [here](https://github.com/RainwayApp/Forecast/releases/latest) 
 
 # Usage 
 
