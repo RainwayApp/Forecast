@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using Newtonsoft.Json;
@@ -17,7 +18,7 @@ namespace Forecast.Models
         /// <summary>
         /// Indicates if a ping/connection was able to be made to the host
         /// </summary>
-        public bool CouldPing { get; set; }
+        public bool CouldPingHostName { get; set; }
 
         /// <summary>
         /// Indicates if the target address family was present on the DNS entries.
@@ -29,9 +30,9 @@ namespace Forecast.Models
         public string HostName { get; set; }
 
         /// <summary>
-        /// The desired address family IP address.
+        /// The list of IP addresses that matches the target family
         /// </summary>
-        public string IpAddress { get; set; }
+        public List<AddressInformation> AddressInformation { get; set; }
         /// <summary>
         /// The port the host is listening on.
         /// </summary>

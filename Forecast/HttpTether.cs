@@ -1,12 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Security;
 using System.Net.Sockets;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
+using DnsClient;
+using DnsClient.Protocol;
 using Forecast.Models;
+using Newtonsoft.Json;
 
 namespace Forecast
 {
@@ -73,6 +77,33 @@ namespace Forecast
             }
         }
 
+        private List<AddressInformation> GetRecords(IReadOnlyList<DnsResourceRecord> answers, ushort port, AddressFamily family)
+        {
+            var records = new List<AddressInformation>();
+            if (family == AddressFamily.InterNetwork)
+            {
+                records.AddRange(answers.ARecords()
+                    .Select(answer => new AddressInformation
+                    {
+                        IpAddress = answer.Address.ToString(),
+                        TimeToLive = answer.TimeToLive,
+                        CouldPing = PingHost(answer.Address.ToString(), port, family)
+                    }));
+            }
+            else if (family == AddressFamily.InterNetworkV6)
+            {
+                records.AddRange(answers.AaaaRecords()
+                    .Select(answer => new AddressInformation
+                    {
+                        IpAddress = answer.Address.ToString(),
+                        TimeToLive = answer.TimeToLive,
+                        CouldPing = PingHost(answer.Address.ToString(), port, family)
+                    }));
+            }
+            return records;
+        }
+
+
         /// <summary>
         /// Runs a set of basic test on a target HTTP or WebSocket to see if things are properly configured.
         /// </summary>
@@ -83,27 +114,29 @@ namespace Forecast
         private async Task<HostInformation> ParseHost(string host, ushort port, AddressFamily family = AddressFamily.InterNetwork)
         {
             //Check if the host is valid
+
             if (!await HostValid(host))
             {
                 throw new InvalidOperationException($"{host} is an invalid host name.");
             }
-            var hostInformation = new HostInformation { HostName = host, Port = port, AddressFamily = family };
-            //Check if the dns has our target family
-            foreach (var address in await Dns.GetHostAddressesAsync(host))
+            var hostInformation = new HostInformation { HostName = host, Port = port, AddressFamily = family, AddressInformation = new List<AddressInformation>() };
+            var lookup = new LookupClient();
+            var result = await lookup.QueryAsync(host, family == AddressFamily.InterNetwork ? QueryType.A : QueryType.AAAA);
+            if (result == null)
             {
-                if (address.AddressFamily == family)
-                {
-                    hostInformation.IpAddress = address.ToString();
-                    hostInformation.HasTargetAddressFamily = true;
-                }
+                throw new DnsResponseException("DNS Failed to parse.");
             }
-            if (!hostInformation.HasTargetAddressFamily)
+
+            hostInformation.AddressInformation = GetRecords(result.Answers, port, family);
+            if (hostInformation.AddressInformation.Count == 0)
             {
                 return hostInformation;
             }
+
+            hostInformation.HasTargetAddressFamily = true;
             //Can we reach the host?
-            hostInformation.CouldPing = PingHost(host, port, family);
-            if (!hostInformation.CouldPing)
+            hostInformation.CouldPingHostName = PingHost(host, port, family);
+            if (!hostInformation.CouldPingHostName)
             {
                 return hostInformation;
             }
