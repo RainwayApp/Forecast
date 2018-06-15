@@ -114,12 +114,12 @@ namespace Forecast
         private async Task<HostInformation> ParseHost(string host, ushort port, AddressFamily family = AddressFamily.InterNetwork)
         {
             //Check if the host is valid
-
+            var hostInformation = new HostInformation { HostName = host, Port = port, AddressFamily = family, AddressInformation = new List<AddressInformation>() };
             if (!await HostValid(host))
             {
-                throw new InvalidOperationException($"{host} is an invalid host name.");
+                hostInformation.HostValid = false;
+                return hostInformation;
             }
-            var hostInformation = new HostInformation { HostName = host, Port = port, AddressFamily = family, AddressInformation = new List<AddressInformation>() };
             var lookup = new LookupClient();
             var result = await lookup.QueryAsync(host, family == AddressFamily.InterNetwork ? QueryType.A : QueryType.AAAA);
             if (result == null)

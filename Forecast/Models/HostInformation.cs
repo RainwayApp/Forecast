@@ -30,6 +30,11 @@ namespace Forecast.Models
         public string HostName { get; set; }
 
         /// <summary>
+        /// Indicates if the host name was valid
+        /// </summary>
+        public bool HostValid { get; set; }
+
+        /// <summary>
         /// The list of IP addresses that matches the target family
         /// </summary>
         public List<AddressInformation> AddressInformation { get; set; }
