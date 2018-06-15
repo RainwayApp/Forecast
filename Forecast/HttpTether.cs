@@ -114,10 +114,16 @@ namespace Forecast
         private async Task<HostInformation> ParseHost(string host, ushort port, AddressFamily family = AddressFamily.InterNetwork)
         {
             //Check if the host is valid
-            var hostInformation = new HostInformation { HostName = host, Port = port, AddressFamily = family, AddressInformation = new List<AddressInformation>() };
-            if (!await HostValid(host))
+            var hostInformation = new HostInformation
             {
-                hostInformation.HostValid = false;
+                HostName = host,
+                Port = port,
+                AddressFamily = family,
+                AddressInformation = new List<AddressInformation>(),
+                HostValid = await HostValid(host)
+            };
+            if (!hostInformation.HostValid)
+            {
                 return hostInformation;
             }
             var lookup = new LookupClient();
